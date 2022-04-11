@@ -1,14 +1,14 @@
 # use-pagination-firestore
 
-A React Hook that makes it easy to paginate firestore collections.
-This hook is similar, but the not the same as
-[firestore-pagination-hook](https://github.com/bmcmahen/firestore-pagination-hook). This hook
-provides _non cumulative_ pagination and does _not_ maintain references to previous
+A React Hook that makes it easy to paginate firestore collections. This hook
+provides _cumulative_ pagination and does maintain references to previous
 documents, so it might be suitable for large document sets.
+
+This hook is forked to __be cumulative__.
 
 ## Support for Firebase 9
 
-Versions 0.6.x add support for Firebase 9 and are backwards _incompatible_ with previous versions of Firebase. For support for Firebase 8.x, use versions 5.x of `use-pagination-firestore`.
+Versions 0.7.x add support for Firebase 9 and are backwards _incompatible_ with previous versions of Firebase. For support for Firebase 8.x, use versions 5.x of `use-pagination-firestore`.
 
 ## Install
 

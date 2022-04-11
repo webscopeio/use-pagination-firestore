@@ -93,7 +93,7 @@ const getReducer = <T extends DocumentData>() => (state: State<T>, action: Actio
         isLoading: false,
         lastDoc,
         nextQuery,
-        items,
+        items: state.items.concat(items),
         isEnd: items.length < state.limit,
       };
     }

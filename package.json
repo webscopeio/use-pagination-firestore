@@ -1,7 +1,7 @@
 {
   "name": "use-pagination-firestore",
-  "version": "0.6.0",
-  "description": "A non-cumulative pagination hook for use with Firestore",
+  "version": "0.7.1",
+  "description": "A cumulative pagination hook for use with Firestore",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
