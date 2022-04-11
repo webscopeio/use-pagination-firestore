@@ -6,10 +6,7 @@ import {
   DocumentData,
   DocumentSnapshot,
   queryEqual,
-  snapshotEqual,
-  endBefore,
   limit,
-  limitToLast,
   onSnapshot,
   query,
   startAfter
@@ -25,13 +22,10 @@ interface State<T extends DocumentData> {
   lastQuery: Query | undefined;
   firstDocRef: undefined | MutableRefObject<QueryDocumentSnapshot | undefined>;
   docs: QueryDocumentSnapshot[];
-  firstDoc: QueryDocumentSnapshot | undefined;
   lastDoc: QueryDocumentSnapshot | undefined;
-  prevQuery: Query | undefined;
   nextQuery: Query | undefined;
   items: (T & Pick<DocumentSnapshot, 'id'>)[];
   isLoading: boolean;
-  isStart: boolean;
   isEnd: boolean;
   limit: number;
 }
@@ -59,7 +53,6 @@ type Action =
         };
       }
     >
-  | ActionBase<'PREV'>
   | ActionBase<'NEXT'>;
 
 const defaultGuard = <S>(state: S, a: never) => state;
@@ -87,32 +80,20 @@ const getReducer = <T extends DocumentData>() => (state: State<T>, action: Actio
         id: doc.id,
       }));
 
-      
 
-      const firstDoc = docs[0];
+
       const lastDoc = docs[docs.length - 1];
       const queryFromRef = state.queryRef ? state.queryRef.current : undefined;
-      const prevQuery =
-        queryFromRef && firstDoc ? query(queryFromRef, endBefore(firstDoc), limitToLast(state.limit)) : state.lastQuery;
       const nextQuery = queryFromRef && lastDoc ? query(queryFromRef, startAfter(lastDoc), limit(state.limit)) : state.nextQuery;
-      
-      const firstDocRef = state.firstDocRef;
-      if (firstDocRef && firstDocRef.current === undefined) {
-        firstDocRef.current = firstDoc;
-      }
 
       return {
         ...state,
-        docs,
+        docs: state.docs.concat(docs),
         lastQuery: items.length > 0 ? state.query : undefined,
         isLoading: false,
-        firstDoc,
-        firstDocRef,
         lastDoc,
-        prevQuery,
         nextQuery,
         items,
-        isStart: (firstDoc && firstDocRef?.current && snapshotEqual(firstDoc, firstDocRef.current)) || false,
         isEnd: items.length < state.limit,
       };
     }
@@ -122,14 +103,6 @@ const getReducer = <T extends DocumentData>() => (state: State<T>, action: Actio
         ...state,
         isLoading: true,
         query: state.nextQuery,
-      };
-    }
-
-    case 'PREV': {
-      return {
-        ...state,
-        isLoading: true,
-        query: state.prevQuery,
       };
     }
 
@@ -147,11 +120,9 @@ const initialState = {
   docs: [],
   firstDoc: undefined,
   lastDoc: undefined,
-  prevQuery: undefined,
   nextQuery: undefined,
   items: [],
   isLoading: true,
-  isStart: true,
   isEnd: false,
   limit: 10,
 };
@@ -202,9 +173,7 @@ const usePagination = <T extends DocumentData>(firestoreQuery: Query, options: P
     docs: state.docs,
     items: state.items,
     isLoading: state.isLoading,
-    isStart: state.isStart,
     isEnd: state.isEnd,
-    getPrev: () => dispatch({ type: 'PREV' }),
     getNext: () => dispatch({ type: 'NEXT' }),
   };
 };
